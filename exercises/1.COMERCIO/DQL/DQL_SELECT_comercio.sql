@@ -26,7 +26,8 @@ select cliente_id
       ,email
       ,telefono
       ,fecha_registro
-FROM comercio.cliente;
+FROM comercio.cliente
+where cliente_id  != 1;
 
 -- 2. Listar productos con su proveedor
 SELECT p.producto_id
