@@ -87,13 +87,15 @@ resource "aws_iam_role_policy_attachment" "ec2_attach_policy" {
 }
 
 # ------------------------------------------------------------------
-# Security Group para EC2 (permite SSH desde cualquier IP)
+# Security Group para EC2 (permite SSH y Jupyter Notebook)
 # ------------------------------------------------------------------
+# Security Group para EC2 (SSH y Jupyter Notebook)
 resource "aws_security_group" "ec2_sg" {
   name        = "ec2-security-group"
-  description = "Permite SSH"
+  description = "Permite SSH y Jupyter Notebook sin IP fija"
   vpc_id      = data.aws_vpc.default.id
 
+  # Permitir SSH desde cualquier IP (solo para pruebas, no recomendado en producción)
   ingress {
     from_port   = 22
     to_port     = 22
@@ -101,13 +103,27 @@ resource "aws_security_group" "ec2_sg" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
+  # Permitir Jupyter Notebook desde cualquier IP (usar token para seguridad)
+  ingress {
+    from_port   = 8888
+    to_port     = 8888
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  # Permitir todo el tráfico saliente
   egress {
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
+
+  tags = {
+    Name = "EC2-SG-SSH-Jupyter"
+  }
 }
+
 
 # ------------------------------------------------------------------
 # Instance Profile para EC2 (para asociar IAM Role)
